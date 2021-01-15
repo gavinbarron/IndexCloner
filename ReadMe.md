@@ -11,7 +11,7 @@ e.g. `IndexCloner.exe service-one AEF345349023CD service-two CED35734902EEF copy
 * The filter-field must be both sortable and retrievable
 * This tool currently provides no re-try logic for failed actions
 * If there are changes to the data in the source during execution of this tool they may not be captured and migrated to the destination index
-* I'm making this available for use for free, I provide no warrantees express or implied, use at your own risk
+* I'm making this available for use for free, I provide no warranties express or implied, use at your own risk
 * That said it worked just fine for my case.
 
 ## FAQ
