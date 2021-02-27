@@ -14,10 +14,10 @@ namespace IndexCloner
 {
     class Program
     {
-        private int _successfullyIndexed = 0;
-        private int _failCount = 0;
+        private static int _successfullyIndexed = 0;
+        private static int _failCount = 0;
 
-        async Task Main(string[] args)
+        static async Task Main(string[] args)
         {
             if (args.Length == 1 && IsHelpParam(args[0]))
             {
@@ -27,7 +27,7 @@ namespace IndexCloner
                 return;
             }
 
-            if (args.Length != 6 || args.Length != 7)
+            if (args.Length != 6 && args.Length != 7)
             {
                 await Console.Error.WriteLineAsync(
                     "Error: usage IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <index-name> <filter-field> [copyIndexDefinition]");
@@ -184,7 +184,7 @@ namespace IndexCloner
             return false;
         }
 
-        private async Task SendDocumentsToDestination(
+        private static async Task SendDocumentsToDestination(
             SearchClient destinationSearchClient,
             IndexDocumentsBatch<JsonElement> indexBatch
         )
