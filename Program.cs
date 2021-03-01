@@ -80,7 +80,7 @@ namespace IndexCloner
             string filter = "";
             // Compose the initial query
             Response<SearchResults<JsonElement>> searchAsync = await sourceSearchClient.SearchAsync<JsonElement>("*",
-                                                                   new SearchOptions() {OrderBy = {filterField}});
+                                                                   new SearchOptions() { OrderBy = { filterField } });
             while (!allDone)
             {
                 IAsyncEnumerable<Page<SearchResult<JsonElement>>> pages = searchAsync.Value.GetResultsAsync()
@@ -142,12 +142,19 @@ namespace IndexCloner
                 if (indexBatch.Actions.LastOrDefault()
                              ?.Document.TryGetProperty(filterField, out lastFilterValue) ?? false)
                 {
-                    filter = $"{filterField} ge '{lastFilterValue.ToString() ?? string.Empty}'";
+                    if (bool.TryParse(lastFilterValue.ToString(), out _) || DateTime.TryParse(lastFilterValue.ToString(), out _))
+                    {
+                        filter = $"{filterField} ge {lastFilterValue}";
+                    }
+                    else
+                    {
+                        filter = $"{filterField} ge '{lastFilterValue.ToString()}'";
+                    }
                     searchAsync = await sourceSearchClient.SearchAsync<JsonElement>("*",
                                       new SearchOptions()
                                       {
                                           Filter = filter,
-                                          OrderBy = {filterField}
+                                          OrderBy = { filterField }
                                       });
                 }
 
