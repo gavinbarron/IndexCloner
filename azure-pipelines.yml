@@ -1,0 +1,22 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- script: echo Hello, world!
+  displayName: 'Run a one-line script'
+
+- script: dotnet clean IndexCloner.sln
+  displayName: 'dotnet clean'
+- script: dotnet restore IndexCloner.sln
+  displayName: 'dotnet restore'
+- script: dotnet build IndexCloner.sln
+- task: DotNetCoreCLI@2
+  displayName: dotnet publish
