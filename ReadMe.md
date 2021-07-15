@@ -7,7 +7,7 @@ e.g. `IndexCloner.exe service-one AEF345349023CD service-two CED35734902EEF copy
 
 ## Caveats and limitations
 
-* All the fields on the source need to be marked as retreivable, if they are not you will loose the data in those field
+* All the fields on the source need to be marked as retreivable, if they are not you will loose the data in those fields
 * The filter-field must be both sortable and retrievable
 * This tool currently provides no re-try logic for failed actions
 * If there are changes to the data in the source during execution of this tool they may not be captured and migrated to the destination index
