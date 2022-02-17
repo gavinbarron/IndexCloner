@@ -41,19 +41,23 @@ namespace IndexCloner
 
         static JsonElement Map(JsonElement input)
         {
-            string inputText = input.GetRawText();
-            OldDoc oldDoc = JsonSerializer.Deserialize<OldDoc>(inputText, new JsonSerializerOptions
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            });
+            // 1:1 cloning with no DTO shape changing:
+            return input;
 
-            NewDoc newDoc = new NewDoc(
-                oldDoc.oldFieldOne,
-                oldDoc.oldFieldTwo,
-                "Hard coded string because OldDoc didn't have an equivalent"
-            );
-            JsonElement elementToReturn = JsonElementFromObject(newDoc);
-            return elementToReturn;
+            // Mapping between two DTO's of different shape:
+            // string inputText = input.GetRawText();
+            // OldDoc oldDoc = JsonSerializer.Deserialize<OldDoc>(inputText, new JsonSerializerOptions
+            // {
+            //     PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            // });
+            //
+            // NewDoc newDoc = new NewDoc(
+            //     oldDoc.oldFieldOne,
+            //     oldDoc.oldFieldTwo,
+            //     "Hard coded string because OldDoc didn't have an equivalent"
+            // );
+            // JsonElement elementToReturn = JsonElementFromObject(newDoc);
+            // return elementToReturn;
         }
 
         static async Task Main(string[] args)
@@ -111,7 +115,7 @@ namespace IndexCloner
                 );
             }
 
-            //Console.WriteLine($"Commencing data migration for {indexToClone} to {destinationSearchService}");
+            Console.WriteLine($"Commencing data migration for {indexToClone} to {destinationSearchService}");
             var dataMigrationTimer = new Stopwatch();
             dataMigrationTimer.Start();
             var indexBatch = new IndexDocumentsBatch<JsonElement>();
