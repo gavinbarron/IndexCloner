@@ -17,6 +17,45 @@ namespace IndexCloner
         private static int _successfullyIndexed = 0;
         private static int _failCount = 0;
 
+        public static JsonDocument JsonDocumentFromObject(object value, JsonSerializerOptions options = null)
+        {
+            if (value is string valueStr)
+            {
+                try { return JsonDocument.Parse(valueStr); }
+                catch { }
+            }
+
+            byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(value, options);
+            return JsonDocument.Parse(bytes);
+        }
+
+        public static JsonElement JsonElementFromObject(object value, JsonSerializerOptions options = null)
+        {
+            JsonElement result;
+            using (JsonDocument doc = JsonDocumentFromObject(value, options))
+            {
+                result = doc.RootElement.Clone();
+            }
+            return result;
+        }
+
+        static JsonElement Map(JsonElement input)
+        {
+            string inputText = input.GetRawText();
+            OldDoc oldDoc = JsonSerializer.Deserialize<OldDoc>(inputText, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            NewDoc newDoc = new NewDoc(
+                oldDoc.oldFieldOne,
+                oldDoc.oldFieldTwo,
+                "Hard coded string because OldDoc didn't have an equivalent"
+            );
+            JsonElement elementToReturn = JsonElementFromObject(newDoc);
+            return elementToReturn;
+        }
+
         static async Task Main(string[] args)
         {
             if (args.Length == 1 && IsHelpParam(args[0]))
@@ -27,7 +66,7 @@ namespace IndexCloner
                 return;
             }
 
-            if (args.Length != 6 && args.Length != 7)
+            if (args.Length != 7 && args.Length != 8)
             {
                 await Console.Error.WriteLineAsync(
                     "Error: usage IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <index-name> <filter-field> [copyIndexDefinition]");
@@ -42,11 +81,12 @@ namespace IndexCloner
             string destinationSearchService = $"https://{args[2]}.search.windows.net";
             string destinationKey = args[3];
             string indexToClone = args[4];
-            string filterField = args[5];
+            string indexDestinationName = args[5];
+            string filterField = args[6];
 
             bool copyIndexDefinition = false;
-            if (args.Length == 7)
-                bool.TryParse(args[6], out copyIndexDefinition);
+            if (args.Length == 8)
+                bool.TryParse(args[7], out copyIndexDefinition);
             var sourceEndpoint = new Uri(sourceSearchService);
             var sourceCredentials = new AzureKeyCredential(sourceKey);
             var sourceIndexClient = new SearchIndexClient(sourceEndpoint, sourceCredentials);
@@ -55,7 +95,7 @@ namespace IndexCloner
             var destinationEndpoint = new Uri(destinationSearchService);
             var destinationCredential = new AzureKeyCredential(destinationKey);
             var destinationIndexClient = new SearchIndexClient(destinationEndpoint, destinationCredential);
-            var destinationSearchClient = new SearchClient(destinationEndpoint, indexToClone, destinationCredential);
+            var destinationSearchClient = new SearchClient(destinationEndpoint, indexDestinationName, destinationCredential);
             var definitionCloneTimer = new Stopwatch();
 
             Console.WriteLine($"Migration started {DateTimeOffset.UtcNow:O}");
@@ -71,7 +111,7 @@ namespace IndexCloner
                 );
             }
 
-            Console.WriteLine($"Commencing data migration for {indexToClone} to {destinationSearchService}");
+            //Console.WriteLine($"Commencing data migration for {indexToClone} to {destinationSearchService}");
             var dataMigrationTimer = new Stopwatch();
             dataMigrationTimer.Start();
             var indexBatch = new IndexDocumentsBatch<JsonElement>();
@@ -93,7 +133,7 @@ namespace IndexCloner
                         .ForEach(v =>
                              batch.Actions.Add(new IndexDocumentsAction<JsonElement>(
                                  IndexActionType.MergeOrUpload,
-                                 v.Document
+                                 Map(v.Document)
                              ))
                         );
 #if !DEBUG
