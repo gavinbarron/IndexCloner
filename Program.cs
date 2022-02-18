@@ -65,7 +65,7 @@ namespace IndexCloner
             if (args.Length == 1 && IsHelpParam(args[0]))
             {
                 Console.WriteLine(
-                    "Help: usage IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <index-name> <filter-field> [copyIndexDefinition]");
+                    "Help: usage IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <source-index-name> <destination-index-name> <filter-field> [copyIndexDefinition]");
                 Environment.Exit(0);
                 return;
             }
@@ -73,7 +73,7 @@ namespace IndexCloner
             if (args.Length != 7 && args.Length != 8)
             {
                 await Console.Error.WriteLineAsync(
-                    "Error: usage IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <index-name> <filter-field> [copyIndexDefinition]");
+                    "Error: usage IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <source-index-name> <destination-index-name> <filter-field> [copyIndexDefinition]");
                 Environment.Exit(-1);
                 return;
             }
