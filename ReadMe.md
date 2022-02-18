@@ -2,8 +2,8 @@
 
 A simple dotnet core 3.1 utility to copy an Azure Search index from one search service to another. This tool is built using the [Version 11 of the Azure Cognitive Search libraries for .NET](https://docs.microsoft.com/en-us/dotnet/api/overview/azure/search?view=azure-dotnet)
 
-Usage: `IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <index-name> <filter-field> [copyIndexDefinition]`  
-e.g. `IndexCloner.exe service-one AEF345349023CD service-two CED35734902EEF copy-me lastUpdate true`
+Usage: `IndexCloner.exe <source-search-service-name> <source-search-service-key> <destination-search-service-name> <destination-search-service-key> <source-index-name> <destination-index-name> <filter-field> [copyIndexDefinition]`  
+e.g. `IndexCloner.exe service-one AEF345349023CD service-two CED35734902EEF copy-me into-me lastUpdate true`
 
 ## Caveats and limitations
 
@@ -16,8 +16,14 @@ e.g. `IndexCloner.exe service-one AEF345349023CD service-two CED35734902EEF copy
 
 ## FAQ
 
-* Why is a filter-field required?  
+* Why is a filter-field required?
 
 > The Azure Search service has a [hard limit of 100K for the $skip](https://docs.microsoft.com/en-us/rest/api/searchservice/search-documents#skip-optional)
 parameter which is used in OData to page through results without a field to build ordered filtered queries against
 this tool would be unable to handle indexes with > 100,000 records
+
+* Must the fields in the destination index be the same as the fields in the source index?
+
+> By default the tool performs a 1:1 clone of the source index with all fields retained.
+However, if there is a need for the data to be mutated during the copy, a `map` function is provided.
+Using that function, you can define the fields present in both the source and destination index DTOs and map fields between them.
